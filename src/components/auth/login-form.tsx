@@ -3,6 +3,21 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "../../lib/supabase/client";
 import Link from "next/link";
+
+function mapAuthError(message: string) {
+  const normalized = message.toLowerCase();
+
+  if (normalized.includes("invalid login credentials")) {
+    return "Sai email hoặc mật khẩu. Nếu vừa đăng ký, hãy kiểm tra email xác nhận trước khi đăng nhập.";
+  }
+
+  if (normalized.includes("email not confirmed")) {
+    return "Email chưa được xác nhận. Vui lòng mở email và bấm link xác nhận.";
+  }
+
+  return message;
+}
+
 export function LoginForm() {
   const router = useRouter();
   const supabase = createClient();
@@ -16,19 +31,21 @@ export function LoginForm() {
     setError(null);
     setLoading(true);
     try {
+      const normalizedEmail = email.trim().toLowerCase();
+
       const { data, error } = await supabase.auth.signInWithPassword({
-        email,
+        email: normalizedEmail,
         password,
       });
       if (error) {
-        setError(error.message);
+        setError(mapAuthError(error.message));
         return;
       }
       if (data.session) {
         router.push("/dashboard");
         router.refresh();
       }
-    } catch (err) {
+    } catch {
       setError("Có lỗi xảy ra. Vui lòng thử lại.");
     } finally {
       setLoading(false);
@@ -50,7 +67,7 @@ export function LoginForm() {
   return (
     <div className="mt-8 space-y-6">
       {error && (
-        <div className="bg-red-50 text-red-500 p-3 rounded-md text-sm">
+        <div className="rounded-md bg-red-50 p-3 text-sm text-red-600">
           {error}
         </div>
       )}
@@ -59,17 +76,9 @@ export function LoginForm() {
         <button
           type="button"
           onClick={handleGitHubLogin}
-          className="w-full flex items-center justify-center gap-2 py-2
-px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium
-text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2
-focus:ring-offset-2 focus:ring-blue-500"
+          className="flex w-full items-center justify-center gap-2 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         >
-          <svg
-            className="w-5 h-5"
-            fill="currentColor"
-            viewBox="0 0 24
-24"
-          >
+          <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
             <path
               fillRule="evenodd"
               d="M12 2C6.477 2 2 6.484 2 12.017c0
@@ -94,7 +103,7 @@ focus:ring-offset-2 focus:ring-blue-500"
           <div className="w-full border-t border-gray-300" />
         </div>
         <div className="relative flex justify-center text-sm">
-          <span className="px-2 bg-white text-gray-500">Hoặc</span>
+          <span className="bg-white px-2 text-gray-600">Hoặc</span>
         </div>
       </div>
       {/* Email/Password Form */}
@@ -102,8 +111,7 @@ focus:ring-offset-2 focus:ring-blue-500"
         <div>
           <label
             htmlFor="email"
-            className="block text-sm font-medium
-text-gray-700"
+            className="block text-sm font-medium text-gray-800"
           >
             Email
           </label>
@@ -113,16 +121,14 @@ text-gray-700"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="mt-1 block w-full px-3 py-2 border border-gray300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500
-focus:border-blue-500"
+            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-blue-500"
             placeholder="email@example.com"
           />
         </div>
         <div>
           <label
             htmlFor="password"
-            className="block text-sm font-medium
-text-gray-700"
+            className="block text-sm font-medium text-gray-800"
           >
             Mật khẩu
           </label>
@@ -132,22 +138,29 @@ text-gray-700"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="mt-1 block w-full px-3 py-2 border border-gray300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500
-focus:border-blue-500"
+            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-blue-500"
             placeholder="••••••••"
           />
+          <div className="mt-2 text-right">
+            <Link
+              href="/forgot-password"
+              className="text-sm text-blue-700 hover:text-blue-800"
+            >
+              Quên mật khẩu?
+            </Link>
+          </div>
         </div>
         <button
           type="submit"
           disabled={loading}
-          className="w-full flex justify-center py-2 px-4 border bordertransparent rounded-md shadow-sm text-sm font-medium text-white bg-blue600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex w-full justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {loading ? "Đang xử lý..." : "Đăng nhập"}
         </button>
       </form>
-      <p className="text-center text-sm text-gray-600">
+      <p className="text-center text-sm text-gray-700">
         Chưa có tài khoản?{" "}
-        <Link href="/register" className="text-blue-600 hover:text-blue500">
+        <Link href="/register" className="text-blue-700 hover:text-blue-800">
           Đăng ký ngay
         </Link>
       </p>

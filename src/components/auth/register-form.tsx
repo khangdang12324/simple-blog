@@ -17,10 +17,13 @@ export function RegisterForm() {
     setError(null);
     setLoading(true);
     try {
+      const normalizedEmail = email.trim().toLowerCase();
+
       const { data, error } = await supabase.auth.signUp({
-        email,
+        email: normalizedEmail,
         password,
         options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
           data: {
             display_name: displayName,
           },
@@ -45,7 +48,7 @@ export function RegisterForm() {
   return (
     <form onSubmit={handleRegister} className="mt-8 space-y-6">
       {error && (
-        <div className="bg-red-50 text-red-500 p-3 rounded-md text-sm">
+        <div className="rounded-md bg-red-50 p-3 text-sm text-red-600">
           {error}
         </div>
       )}
@@ -53,7 +56,7 @@ export function RegisterForm() {
         <div>
           <label
             htmlFor="displayName"
-            className="block text-sm fontmedium text-gray-700"
+            className="block text-sm font-medium text-gray-800"
           >
             Tên hiển thị
           </label>
@@ -63,16 +66,14 @@ export function RegisterForm() {
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
             required
-            className="mt-1 block w-full px-3 py-2 border border-gray300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500
-focus:border-blue-500"
+            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-blue-500"
             placeholder="Nguyễn Văn A"
           />
         </div>
         <div>
           <label
             htmlFor="email"
-            className="block text-sm font-medium
-text-gray-700"
+            className="block text-sm font-medium text-gray-800"
           >
             Email
           </label>
@@ -82,16 +83,14 @@ text-gray-700"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="mt-1 block w-full px-3 py-2 border border-gray300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500
-focus:border-blue-500"
+            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-blue-500"
             placeholder="email@example.com"
           />
         </div>
         <div>
           <label
             htmlFor="password"
-            className="block text-sm font-medium
-text-gray-700"
+            className="block text-sm font-medium text-gray-800"
           >
             Mật khẩu
           </label>
@@ -102,23 +101,22 @@ text-gray-700"
             onChange={(e) => setPassword(e.target.value)}
             required
             minLength={6}
-            className="mt-1 block w-full px-3 py-2 border border-gray300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500
-focus:border-blue-500"
+            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-blue-500"
             placeholder="••••••••"
           />
-          <p className="mt-1 text-xs text-gray-500">Tối thiểu 6 ký tự</p>
+          <p className="mt-1 text-xs text-gray-600">Tối thiểu 6 ký tự</p>
         </div>
       </div>
       <button
         type="submit"
         disabled={loading}
-        className="w-full flex justify-center py-2 px-4 border bordertransparent rounded-md shadow-sm text-sm font-medium text-white bg-blue600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="flex w-full justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {loading ? "Đang xử lý..." : "Đăng ký"}
       </button>
-      <p className="text-center text-sm text-gray-600">
+      <p className="text-center text-sm text-gray-700">
         Đã có tài khoản?{" "}
-        <Link href="/login" className="text-blue-600 hover:text-blue500">
+        <Link href="/login" className="text-blue-700 hover:text-blue-800">
           Đăng nhập
         </Link>
       </p>
