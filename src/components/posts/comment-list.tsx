@@ -1,28 +1,31 @@
-import { Comment } from "../../types/database";
+import type { Comment } from "@/types/database";
+
 interface CommentListProps {
   comments: Comment[];
 }
+
 export function CommentList({ comments }: CommentListProps) {
   if (comments.length === 0) {
     return (
-      <p className="text-gray-500 text-center py-8">
+      <p className="py-8 text-center text-gray-500">
         Chưa có bình luận nào. Hãy là người đầu tiên!
       </p>
     );
   }
+
   return (
     <div className="space-y-4">
       {comments.map((comment) => (
-        <div key={comment.id} className="bg-gray-50 p-4 rounded-lg">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="font-medium">
+        <div key={comment.id} className="rounded-lg bg-gray-50 p-4">
+          <div className="mb-2 flex items-center gap-2">
+            <span className="font-medium text-gray-900">
               {comment.profiles?.display_name || "Ẩn danh"}
             </span>
-            <span className="text-gray-400 text-sm">
+            <span className="text-sm text-gray-400">
               {new Date(comment.created_at).toLocaleDateString("vi-VN")}
             </span>
           </div>
-          <p className="text-gray-700">{comment.content}</p>
+          <p className="leading-7 text-gray-700">{comment.content}</p>
         </div>
       ))}
     </div>

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { createClient } from "../../lib/supabase/client";
+import { createClient } from "@/lib/supabase/client";
 
 function mapForgotPasswordError(message: string) {
   const normalized = message.toLowerCase();
@@ -28,9 +28,8 @@ export function ForgotPasswordForm() {
     setLoading(true);
 
     try {
-      const normalizedEmail = email.trim().toLowerCase();
       const { error } = await supabase.auth.resetPasswordForEmail(
-        normalizedEmail,
+        email.trim().toLowerCase(),
         {
           redirectTo: `${window.location.origin}/auth/callback?next=/reset-password`,
         },
@@ -54,13 +53,13 @@ export function ForgotPasswordForm() {
   return (
     <form onSubmit={handleResetPassword} className="mt-8 space-y-6">
       {error && (
-        <div className="rounded-md bg-red-50 p-3 text-sm text-red-600">
+        <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800">
           {error}
         </div>
       )}
 
       {success && (
-        <div className="rounded-md bg-green-50 p-3 text-sm text-green-700">
+        <div className="rounded-md border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800">
           {success}
         </div>
       )}

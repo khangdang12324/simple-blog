@@ -1,20 +1,23 @@
 "use client";
+
 import { useEffect, useState } from "react";
-import { createClient } from "../../lib/supabase/client";
-import { Comment } from "../../types/database";
-import { CommentList } from "./comment-list";
+import { createClient } from "@/lib/supabase/client";
+import { CommentList } from "@/components/posts/comment-list";
+import type { Comment } from "@/types/database";
+
 interface RealtimeCommentsProps {
   postId: string;
   initialComments: Comment[];
 }
+
 export function RealtimeComments({
   postId,
   initialComments,
 }: RealtimeCommentsProps) {
-  const supabase = createClient();
+  const [supabase] = useState(createClient);
   const [comments, setComments] = useState<Comment[]>(initialComments);
+
   useEffect(() => {
-    // Subscribe to new comments
     const channel = supabase
       .channel(`comments:${postId}`)
       .on(
@@ -26,29 +29,35 @@ export function RealtimeComments({
           filter: `post_id=eq.${postId}`,
         },
         async (payload) => {
-          // Fetch the new comment with profile data
           const { data: newComment } = await supabase
             .from("comments")
             .select(
               `
- *,
- profiles (
- display_name,
- avatar_url
- )
- `,
+              *,
+              profiles (
+                display_name,
+                avatar_url
+              )
+              `,
             )
             .eq("id", payload.new.id)
             .single();
+
           if (newComment) {
-            setComments((prev) => [...prev, newComment]);
+            setComments((prev) =>
+              prev.some((comment) => comment.id === newComment.id)
+                ? prev
+                : [...prev, newComment as Comment],
+            );
           }
         },
       )
       .subscribe();
+
     return () => {
       supabase.removeChannel(channel);
     };
   }, [postId, supabase]);
+
   return <CommentList comments={comments} />;
 }

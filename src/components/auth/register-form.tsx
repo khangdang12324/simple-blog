@@ -1,40 +1,48 @@
 "use client";
+
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { createClient } from "@/src/lib/supabase/client";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+
 export function RegisterForm() {
   const router = useRouter();
   const supabase = createClient();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
-    try {
-      const normalizedEmail = email.trim().toLowerCase();
 
+    try {
       const { data, error } = await supabase.auth.signUp({
-        email: normalizedEmail,
+        email: email.trim().toLowerCase(),
         password,
         options: {
           emailRedirectTo: `${window.location.origin}/auth/callback`,
           data: {
-            display_name: displayName,
+            display_name: displayName.trim(),
           },
         },
       });
+
       if (error) {
         setError(error.message);
         return;
       }
+
+      if (data.session) {
+        router.push("/dashboard");
+        router.refresh();
+        return;
+      }
+
       if (data.user) {
-        // Đăng ký thành công
         router.push(
           "/login?message=Đăng ký thành công! Vui lòng kiểm tra email để xác nhận.",
         );
@@ -45,13 +53,15 @@ export function RegisterForm() {
       setLoading(false);
     }
   };
+
   return (
     <form onSubmit={handleRegister} className="mt-8 space-y-6">
       {error && (
-        <div className="rounded-md bg-red-50 p-3 text-sm text-red-600">
+        <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800">
           {error}
         </div>
       )}
+
       <div className="space-y-4">
         <div>
           <label
@@ -70,6 +80,7 @@ export function RegisterForm() {
             placeholder="Nguyễn Văn A"
           />
         </div>
+
         <div>
           <label
             htmlFor="email"
@@ -87,6 +98,7 @@ export function RegisterForm() {
             placeholder="email@example.com"
           />
         </div>
+
         <div>
           <label
             htmlFor="password"
@@ -107,6 +119,7 @@ export function RegisterForm() {
           <p className="mt-1 text-xs text-gray-600">Tối thiểu 6 ký tự</p>
         </div>
       </div>
+
       <button
         type="submit"
         disabled={loading}
@@ -114,6 +127,7 @@ export function RegisterForm() {
       >
         {loading ? "Đang xử lý..." : "Đăng ký"}
       </button>
+
       <p className="text-center text-sm text-gray-700">
         Đã có tài khoản?{" "}
         <Link href="/login" className="text-blue-700 hover:text-blue-800">

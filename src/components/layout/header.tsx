@@ -1,3 +1,4 @@
+// src/components/layout/header.tsx
 import Link from "next/link";
 import { createClient } from "../../lib/supabase/server";
 import { redirect } from "next/navigation";
@@ -5,7 +6,6 @@ import { redirect } from "next/navigation";
 export async function Header() {
   async function logoutAction() {
     "use server";
-
     const supabase = await createClient();
     await supabase.auth.signOut();
     redirect("/login");
@@ -15,6 +15,7 @@ export async function Header() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
   return (
     <header className="bg-white shadow">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -22,9 +23,15 @@ export async function Header() {
           <Link href="/" className="text-xl font-bold text-gray-900">
             Simple Blog
           </Link>
+
+          {/* CHỖ NÀY ĐÃ XÓA Ô TÌM KIẾM */}
+
           <nav className="flex items-center gap-4">
             <Link href="/" className="text-gray-600 hover:text-gray-900">
               Trang chủ
+            </Link>
+            <Link href="/search" className="text-gray-600 hover:text-gray-900">
+              Tìm kiếm
             </Link>
             {user ? (
               <>
@@ -33,6 +40,12 @@ export async function Header() {
                   className="text-gray-600 hover:text-gray-900"
                 >
                   Dashboard
+                </Link>
+                <Link
+                  href="/profile"
+                  className="text-gray-600 hover:text-gray-900"
+                >
+                  Hồ sơ
                 </Link>
                 <form action={logoutAction}>
                   <button
@@ -44,20 +57,12 @@ export async function Header() {
                 </form>
               </>
             ) : (
-              <>
-                <Link
-                  href="/login"
-                  className="text-gray-600 hover:text-gray-900"
-                >
-                  Đăng nhập
-                </Link>
-                <Link
-                  href="/register"
-                  className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
-                >
-                  Đăng ký
-                </Link>
-              </>
+              <Link
+                href="/login"
+                className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+              >
+                Đăng nhập
+              </Link>
             )}
           </nav>
         </div>

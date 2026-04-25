@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "../../lib/supabase/client";
+import { createClient } from "@/lib/supabase/client";
 
 function mapResetError(message: string) {
   const normalized = message.toLowerCase();
@@ -17,7 +17,6 @@ function mapResetError(message: string) {
 export function ResetPasswordForm() {
   const router = useRouter();
   const supabase = createClient();
-
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -61,7 +60,7 @@ export function ResetPasswordForm() {
   return (
     <form onSubmit={handleUpdatePassword} className="mt-8 space-y-6">
       {error && (
-        <div className="rounded-md bg-red-50 p-3 text-sm text-red-600">
+        <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800">
           {error}
         </div>
       )}

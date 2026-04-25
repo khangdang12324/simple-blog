@@ -1,4 +1,5 @@
-import { LoginForm } from "../../components/auth/login-form";
+import { LoginForm } from "@/components/auth/login-form";
+
 export default async function LoginPage({
   searchParams,
 }: {
@@ -17,7 +18,7 @@ export default async function LoginPage({
         </div>
 
         {params?.message && (
-          <div className="rounded-md bg-green-50 p-3 text-sm text-green-700">
+          <div className="rounded-md border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800">
             {params.message}
           </div>
         )}
