@@ -1,8 +1,10 @@
-import { redirect } from "next/navigation";
+import Link from "next/link";
 import { createClient } from "../../lib/supabase/server";
-
+import { redirect } from "next/navigation";
+import { PostList } from "../../components/dashboard/post-list";
 export default async function DashboardPage() {
   const supabase = await createClient();
+
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -10,17 +12,40 @@ export default async function DashboardPage() {
   if (!user) {
     redirect("/login");
   }
-
+  // Lấy tất cả bài viết của user (kể cả draft)
+  const { data: posts, error } = await supabase
+    .from("posts")
+    .select("*")
+    .eq("author_id", user.id)
+    .order("created_at", { ascending: false });
+  if (error) {
+    console.error("Error fetching posts:", error);
+  }
   return (
-    <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-10 sm:px-6 lg:px-8">
-      <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <p className="mt-2 text-gray-700">Ban da dang nhap thanh cong.</p>
-        <p className="mt-4 text-sm text-gray-600">
-          Email hien tai:{" "}
-          <span className="font-medium text-gray-900">{user.email}</span>
-        </p>
+    <main className="max-w-4xl mx-auto px-4 py-8">
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold">Bài viết của tôi</h1>
+        <Link
+          href="/dashboard/new"
+          className="bg-blue-600 text-white px-4 py-2 rounded-md
+hover:bg-blue-700"
+        >
+          + Viết bài mới
+        </Link>
       </div>
+      {posts && posts.length > 0 ? (
+        <PostList posts={posts} />
+      ) : (
+        <div className="text-center py-12 bg-gray-50 rounded-lg">
+          <p className="text-gray-500 mb-4">Bạn chưa có bài viết nào.</p>
+          <Link
+            href="/dashboard/new"
+            className="text-blue-600 hover:text-blue-500"
+          >
+            Viết bài đầu tiên →
+          </Link>
+        </div>
+      )}
     </main>
   );
 }
